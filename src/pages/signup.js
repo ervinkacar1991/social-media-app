@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import FirebaseContext from "../context/firebase";
 import * as ROUTES from "../constants/routes";
+import doesUsernameExist from "../services/firebase";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -17,8 +18,41 @@ const Signup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    try {
-    } catch (error) {}
+
+    const usernameExists = await doesUsernameExist(username);
+    console.log("usernameexist", usernameExists);
+    if (!usernameExists.length) {
+      try {
+        const createdUserResult = await firebase
+          .auth()
+          .createUserWithEmailAndPassword(emailAddress, password);
+
+        //authentication
+        // -> emailAddress, password, username (displayName)
+
+        await createdUserResult.user.updateProfile({ displayName: username });
+
+        //firebase user collection (create a document)
+
+        await firebase.firestore().collection("users").add({
+          userId: createdUserResult.user.uid,
+          username: username.toLowerCase(),
+          fullName,
+          emailAddress: emailAddress.toLowerCase(),
+          following: [],
+          dateCreated: Date.now(),
+        });
+        navigate(ROUTES.DASHBOARD);
+      } catch (error) {
+        setUsername("");
+        setFullName("");
+        setEmailAddress("");
+        setPassword("");
+        setError(error.message);
+      }
+    } else {
+      setError("That username is already taken, please try another.");
+    }
   };
 
   useEffect(() => {
@@ -86,7 +120,7 @@ const Signup = () => {
         <div className="flex justify-center items-center flex-col w-full bg-white p-4 rounded border-gray-primary">
           <p className="text-sm">
             Have an account?{``}
-            <Link to="/login" className="font-bold text-blue-medium">
+            <Link to={ROUTES.LOGIN} className="font-bold text-blue-medium">
               Log In
             </Link>
           </p>

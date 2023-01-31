@@ -53,7 +53,7 @@ const Login = () => {
               onChange={(e) => setEmailAddress(e.target.value)}
             />
             <input
-              aria-label="Enter you email password"
+              aria-label="Enter you password"
               type="password"
               placeholder="Password"
               className="text-sm text-gray-base w-full mr-3 py-5 px-4 h-2 border border-gray-primary rounded mb-2"
@@ -72,7 +72,7 @@ const Login = () => {
         <div className="flex justify-center items-center flex-col w-full bg-white p-4 rounded border-gray-primary">
           <p className="text-sm">
             Dont have an account?{``}
-            <Link to="/signup" className="font-bold text-blue-medium">
+            <Link to={ROUTES.SIGN_UP} className="font-bold text-blue-medium">
               Sign up
             </Link>
           </p>
